@@ -14,7 +14,7 @@ function App() {
   const BET_AMOUNT = 10;
   const ROWS = 3;
   const COLS = 5;
-  const SYMBOL_SIZE = 120; // Size of each symbol in pixels
+  const SYMBOL_SIZE = 160; // Size of each symbol in pixels
 
   async function loadAssets() {
     await Assets.init({ manifest: "/manifest.json" });
@@ -23,7 +23,7 @@ function App() {
   }
 
   const initializeReels = () => {
-    if (dataSymbols.length === 0) return; // Ensure dataSymbols is loaded
+    if (dataSymbols.length === 0) return; // checking dataSymbols is loaded or not
     const newReels = Array(ROWS).fill(null).map(() =>
       Array(COLS).fill(null).map(() => dataSymbols[Math.floor(Math.random() * dataSymbols.length)])
     );
@@ -43,14 +43,13 @@ function App() {
 
   useEffect(() => {
     if (dataSymbols.length > 0) {
-      initializeReels(); // Initialize reels after dataSymbols is loaded
+      initializeReels(); // Initializing reels only after dataSymbols is loaded
     }
-  }, [dataSymbols]); // Re-run when dataSymbols changes
+  }, [dataSymbols]); // Re-render when dataSymbols changes on spin
 
   const checkWinLines = (reels) => {
     let totalWin = 0;
 
-    // Check each row
     for (let row = 0; row < ROWS; row++) {
       const firstSymbol = reels[row][0];
       let count = 1;
@@ -64,7 +63,7 @@ function App() {
       }
 
       if (count >= 3) {
-        totalWin += count * 5; // Win amount increases with more matching symbols
+        totalWin += count * 5; // adding win 
       }
     }
 
@@ -72,13 +71,11 @@ function App() {
   };
 
   const spin = () => {
-    if (spinning || balance < BET_AMOUNT || dataSymbols.length === 0) return; // Ensure dataSymbols is loaded
-
+    if (spinning || balance < BET_AMOUNT || dataSymbols.length === 0) return;
     setSpinning(true);
     setBalance(prev => prev - BET_AMOUNT);
     setWinAmount(0);
 
-    // Animate spins
     const spinDuration = 2000;
     const spinInterval = 100;
     const iterations = spinDuration / spinInterval;
@@ -92,7 +89,6 @@ function App() {
         clearInterval(spinInterval_id);
         setSpinning(false);
 
-        // Calculate and set wins
         const finalReels = Array(ROWS).fill(null).map(() =>
           Array(COLS).fill(null).map(() => dataSymbols[Math.floor(Math.random() * dataSymbols.length)])
         );
