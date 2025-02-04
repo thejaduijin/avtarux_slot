@@ -35,7 +35,7 @@ function App() {
     const app = new Application({
       resizeTo: window,
     });
-    app.view.style.position = "absolute";
+    // app.view.style.position = "absolute";
 
     loadAssets();
   }, []);
@@ -104,17 +104,12 @@ function App() {
   return (
     <>
       <div className="min-h-screen bg-gray-900 flex items-center justify-center ">
-        <div className="bg-gray-800 p-8 rounded-xl shadow-2xl">
+        <div className="bg-gray-800 rounded-xl shadow-2xl">
           <div className="mb-6 text-center">
             <h1 className="text-3xl font-bold text-white mb-2">Avtar Slots</h1>
-            <div className="flex justify-between  text-lg text-white ">
-              <span>Balance: ${balance}</span>
-              <span>Bet: ${BET_AMOUNT}</span>
-              <span>Win: ${winAmount}</span>
-            </div>
           </div>
           {/* <PayTable></PayTable> */}
-          <Stage width={800} height={500} options={{ backgroundColor: "transparent" }}>
+          <Stage width={800} height={500} >
             <Container>
               {reels.map((row, rowIndex) =>
                 row.map((symbol, colIndex) => (
@@ -151,7 +146,11 @@ function App() {
               pointerdown={spin}
             /> */}
           </Stage>
-
+          <div className="flex justify-between text-lg text-white ">
+            <span>Balance: ${balance}</span>
+            <span>Bet: ${BET_AMOUNT}</span>
+            <span>Win: ${winAmount}</span>
+          </div>
           <button
             onClick={spin}
             disabled={spinning || balance < BET_AMOUNT}
@@ -165,6 +164,7 @@ function App() {
           </button>
         </div>
       </div>
+
     </>
   );
 }
