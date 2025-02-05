@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import { Stage, Container, Sprite } from '@pixi/react';
-import { Application, Assets } from 'pixi.js';
+import { Assets } from 'pixi.js';
 import PayTableComponent from './components/PayTableComponent';
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
   const [dataSymbols, setDataSymbols] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const BET_AMOUNT = 10;
+  const BET_AMOUNT = 5;
   const ROWS = 3;
   const COLS = 5;
   const SYMBOL_SIZE = 160; // Size of each symbol in pixels
@@ -33,43 +33,16 @@ function App() {
 
 
   useEffect(() => {
-    const app = new Application({
-      resizeTo: window,
-    });
-    // app.view.style.position = "absolute";
-
     loadAssets();
   }, []);
 
 
   useEffect(() => {
     if (dataSymbols.length > 0) {
-      initializeReels(); // Initializing reels only after dataSymbols is loaded
+      initializeReels();
     }
-  }, [dataSymbols]); // Re-render when dataSymbols changes on spin
+  }, [dataSymbols]);
 
-  const checkWinLines = (reels) => {
-    let totalWin = 0;
-
-    for (let row = 0; row < ROWS; row++) {
-      const firstSymbol = reels[row][0];
-      let count = 1;
-
-      for (let col = 1; col < COLS; col++) {
-        if (reels[row][col] === firstSymbol) {
-          count++;
-        } else {
-          break;
-        }
-      }
-
-      if (count >= 3) {
-        totalWin += count * 5; // adding win 
-      }
-    }
-
-    return totalWin;
-  };
 
   const spin = () => {
     if (spinning || balance < BET_AMOUNT || dataSymbols.length === 0) return;
@@ -100,6 +73,70 @@ function App() {
         setBalance(prev => prev + win);
       }
     }, spinInterval);
+  };
+
+
+  const checkWinLines = (reels) => {
+    let totalWin = 0;
+    const ROWS = reels.length;
+    const COLS = reels[0].length;
+
+    console.log(reels, "reels");
+
+    // Check Row Wins
+    for (let row = 0; row < ROWS; row++) {
+      const firstSymbol = reels[row][0];
+      let count = 1;
+
+      for (let col = 1; col < COLS; col++) {
+        if (reels[row][col] === firstSymbol) {
+          count++;
+        } else {
+          break;
+        }
+      }
+
+      if (count >= 3) {
+        totalWin += count * 5;
+      }
+    }
+
+    // Check Diagonal Wins (Top-Left to Bottom-Right)
+    let firstSymbol = reels[0][0];
+    let count = 1;
+    for (let i = 1; i < Math.min(ROWS, COLS); i++) {
+      if (reels[i][i] === firstSymbol) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    if (count >= 3) {
+      totalWin += count * 5;
+    }
+
+    // Check Diagonal Wins (Bottom-Left to Top-Right)
+    firstSymbol = reels[ROWS - 1][0];
+    count = 1;
+    for (let i = 1; i < Math.min(ROWS, COLS); i++) {
+      if (reels[ROWS - 1 - i][i] === firstSymbol) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    if (count >= 3) {
+      totalWin += count * 5;
+    }
+
+    // Check Three-row Continuous Symbol Wins
+    for (let col = 0; col < COLS; col++) {
+      if (reels[0][col] === reels[1][col] && reels[1][col] === reels[2][col]) {
+        totalWin += 5;
+      }
+    }
+
+    return totalWin;
   };
 
   function showPayTable() {
