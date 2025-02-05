@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Stage, Container, Sprite, Text } from '@pixi/react';
+import { Stage, Container, Sprite } from '@pixi/react';
 import { Application, Assets } from 'pixi.js';
-import PayTable from './components/Paytable';
+import PayTableComponent from './components/PayTableComponent';
 
 function App() {
   const [reels, setReels] = useState([]);
@@ -10,6 +10,7 @@ function App() {
   const [balance, setBalance] = useState(1000);
   const [winAmount, setWinAmount] = useState(0);
   const [dataSymbols, setDataSymbols] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const BET_AMOUNT = 10;
   const ROWS = 3;
@@ -101,14 +102,18 @@ function App() {
     }, spinInterval);
   };
 
+  function showPayTable() {
+    setOpen(true)
+  }
+
   return (
     <>
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center ">
+      <div className="max-h-screen bg-gray-900 flex items-center justify-center ">
         <div className="bg-gray-800 rounded-xl shadow-2xl">
+
           <div className="mb-6 text-center">
             <h1 className="text-3xl font-bold text-white mb-2">Avtar Slots</h1>
           </div>
-          {/* <PayTable></PayTable> */}
           <Stage width={800} height={500} >
             <Container>
               {reels.map((row, rowIndex) =>
@@ -124,47 +129,44 @@ function App() {
                 ))
               )}
             </Container>
-            {/* <Text
-              text={`Balance: $${balance}`}
-              x={10}
-              y={window.innerHeight - 200}
-              style={{ fill: 'white', fontSize: 24 }}
-            />
-            <Text
-              text={`Win: $${winAmount}`}
-              x={10}
-              y={window.innerHeight - 150}
-              style={{ fill: 'white', fontSize: 24 }}
-            />
-            <Text
-              text="Spin"
-              x={300}
-              y={window.innerHeight - 150}
-              style={{ fill: 'white', fontSize: 24 }}
-              interactive={true}
-              cursor='pointer'
-              pointerdown={spin}
-            /> */}
+            {open && (
+              <PayTableComponent spinning={spinning} setOpen={setOpen}></PayTableComponent>
+            )}
           </Stage>
           <div className="flex justify-between text-lg text-white ">
             <span>Balance: ${balance}</span>
             <span>Bet: ${BET_AMOUNT}</span>
             <span>Win: ${winAmount}</span>
           </div>
-          <button
-            onClick={spin}
-            disabled={spinning || balance < BET_AMOUNT}
-            className={`w-full py-4 rounded-lg text-xl font-bold transition-all
+          <div className="flex justify-between">
+            <button
+              onClick={showPayTable}
+              disabled={spinning || open}
+              className={`w-96 py-4 rounded-lg text-xl font-bold transition-all
+            ${spinning || open
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-slate-500 hover:bg-slate-600 text-white'
+                }`
+              }
+            >
+              PAYTABLE
+            </button>
+
+            <button
+              onClick={spin}
+              disabled={spinning || balance < BET_AMOUNT || open}
+              className={`h-16 w-16 p-24 rounded-lg text-xl font-bold transition-all
             ${spinning || balance < BET_AMOUNT
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-green-500 hover:bg-green-600 text-white'
-              }`}
-          >
-            {spinning ? 'Spinning...' : 'SPIN'}
-          </button>
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-slate-500 hover:bg-slate-600 text-white'
+                }`
+              }
+            >
+              {spinning ? 'Spinning...' : 'SPIN'}
+            </button>
+          </div>
         </div>
       </div>
-
     </>
   );
 }
